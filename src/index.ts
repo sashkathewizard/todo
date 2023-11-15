@@ -10,7 +10,7 @@ const app: Express = express();
 const port = process.env.PORT || 3003;
 app.use(express.json());
 
-app.use('/api', router);
+app.use('/api', router)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Express + TypeScript Server');
