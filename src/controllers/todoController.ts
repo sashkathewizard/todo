@@ -95,7 +95,7 @@ export class TodoController {
             );
 
             if(deletedTodo){
-                res.json({message: 'Deleted successfully'}).status(201);
+                res.json({message: "Deleted successfully"}).status(201);
             }else{
                 res.json({message: 'Not found'}).status(404);
             }
