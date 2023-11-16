@@ -83,4 +83,26 @@ export class TodoController {
         }
     }
 
+    async delete(req: Request, res: Response){
+        const id = req.params.id;
+        try{
+            if (!id) {
+                return res.status(400).json({ message: 'ID is required for updating todo' });
+            }
+
+            const deletedTodo = await Todo.destroy(
+                { where: { id }}
+            );
+
+            if(deletedTodo){
+                res.json({message: 'Deleted successfully'}).status(201);
+            }else{
+                res.json({message: 'Not found'}).status(404);
+            }
+        }catch (e){
+            console.log(e);
+            res.status(500).json({message: 'Internal Server Error'})
+        }
+    }
+
 }
