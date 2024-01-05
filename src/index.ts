@@ -5,6 +5,7 @@ import { initTodoModel } from './models/todo'
 import { router } from './routes'
 import { initUserModel } from './models/user'
 import { errorMiddleware } from './middleware/errorMiddleware'
+import { initTokenStorageModel } from './models/tokenStorage'
 
 dotenv.config()
 console.log(process.env.DB_DATABASE)
@@ -27,6 +28,7 @@ app.listen(port, async (): Promise<void> => {
   try {
     await sequelize.authenticate()
     await initTodoModel()
+    await initTokenStorageModel()
     await initUserModel()
     await sequelize.sync()
     console.log('Connection has been established successfully.')

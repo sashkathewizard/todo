@@ -6,6 +6,7 @@ export const errorMiddleware = (err: MyError, req: Request, res: Response, next:
   }
   if (err.statusCode != null) {
     res.status(err.statusCode).json({ message: err.message })
+    next()
   } else {
     res.status(500).json({ message: 'Iternal server error' })
   }

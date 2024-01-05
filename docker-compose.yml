@@ -1,5 +1,23 @@
 version: '3.8'
 services:
+  app:
+    container_name: node_app
+    build: .
+    image: node_app
+    ports:
+      - "5510:5510"
+    environment:
+      - PG_DB=postgres
+      - PG_USER=postgres
+      - PG_PASSWORD=postgres
+      - PG_HOST=db
+    volumes:
+      - ./:/home/node/app
+      - ./src/models:/home/node/app/models
+    depends_on:
+      - db
+    command: npm run dev
+    restart: always
   db:
     image: postgres:16.0-alpine
     restart: always
@@ -12,5 +30,4 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 volumes:
-  db:
-    driver: local
+  db: {}

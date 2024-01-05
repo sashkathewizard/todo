@@ -1,7 +1,9 @@
-import type express from 'express'
+import { type Request } from 'express'
 
-interface MyRequest extends express.Request {
+interface MyRequest extends Request {
   userData: {
-    userId: string
+    userId: number
   }
 }
+
+export type { MyRequest }

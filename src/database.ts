@@ -4,13 +4,13 @@ import { config } from 'dotenv'
 config()
 
 const sequelize = new Sequelize(
-  process.env.DB_DATABASE ?? 'todo-db',
-  'postgres',
-  'postgres',
+  process.env.DB_DATABASE ?? 'postgres',
+  process.env.DB_USERNAME ?? 'postgres',
+  process.env.DB_PASSWORD ?? 'postgres',
   {
-    host: 'localhost',
+    host: process.env.DB_HOST ?? 'db',
     dialect: 'postgres',
-    port: 5434
+    port: 5432
   }
 )
 

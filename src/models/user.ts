@@ -1,6 +1,7 @@
 import { Model, DataTypes } from 'sequelize'
 import { Todo } from './todo'
 import { sequelize } from '../database'
+import { TokenStorage } from './tokenStorage'
 
 class User extends Model {
   public id!: number
@@ -44,6 +45,10 @@ async function initUserModel (): Promise<void> {
     }
   )
   User.hasMany(Todo, {
+    onDelete: 'CASCADE',
+    foreignKey: 'userId'
+  })
+  User.hasMany(TokenStorage, {
     onDelete: 'CASCADE',
     foreignKey: 'userId'
   })

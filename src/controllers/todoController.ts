@@ -1,8 +1,8 @@
 import { Todo } from '../models/todo'
-import { type Request, type Response } from 'express'
+import { type Response } from 'express'
 import { type MyRequest } from '../types/request'
 
-export class TodoController {
+class TodoController {
   async add (req: MyRequest, res: Response): Promise<any> {
     if (req.userData.userId != null) {
       const { title, description } = req.body
@@ -12,7 +12,7 @@ export class TodoController {
       const todo = Todo.create({
         title,
         description,
-        userId: (req as any).userData.userId
+        userId: req.userData.userId
       })
 
       return res.json({ todo }).status(201)
@@ -21,18 +21,18 @@ export class TodoController {
     }
   }
 
-  async getAll (req: Request, res: Response): Promise<any> {
-    const todos: Todo[] | null = await Todo.findAll({ where: { userId: (req as any).userData.userId } })
+  async getAll (req: MyRequest, res: Response): Promise<any> {
+    const todos: Todo[] | null = await Todo.findAll({ where: { userId: req.userData.userId } })
     if (todos.length === 0) {
       res.json({ message: 'Not found' }).status(404)
     }
     return res.json({ todos }).status(201)
   }
 
-  async getOne (req: Request, res: Response): Promise<any> {
+  async getOne (req: MyRequest, res: Response): Promise<any> {
     const todo: Todo | null = await Todo.findOne({
       where: {
-        id: req.params.id, userId: (req as any).userData.userId
+        id: req.params.id, userId: req.userData.userId
       }
     })
 
@@ -45,7 +45,7 @@ export class TodoController {
     return res.json({ todo }).status(200)
   }
 
-  async update (req: Request, res: Response): Promise<any> {
+  async update (req: MyRequest, res: Response): Promise<any> {
     const id = req.params.id
     const title: string | null = req.body.title
     const description: string | null = req.body.description
@@ -62,7 +62,7 @@ export class TodoController {
       { title, description },
       {
         where: {
-          id, userId: (req as any).userData.userId
+          id, userId: req.userData.userId
         },
         returning: true
       }
@@ -77,7 +77,7 @@ export class TodoController {
     return res.status(200).json({ message: 'Todo updated successfully', todo: updatedRecord })
   }
 
-  async delete (req: Request, res: Response): Promise<any> {
+  async delete (req: MyRequest, res: Response): Promise<any> {
     const id = req.params.id
 
     if (id === null) {
@@ -85,7 +85,7 @@ export class TodoController {
     }
 
     const deletedTodo = await Todo.destroy(
-      { where: { id, userId: (req as any).userData.userId } }
+      { where: { id, userId: req.userData.userId } }
     )
 
     if (deletedTodo != null) {
@@ -95,3 +95,7 @@ export class TodoController {
     }
   }
 }
+
+const todoController = new TodoController()
+
+export default todoController
