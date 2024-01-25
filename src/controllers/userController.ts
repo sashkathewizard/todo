@@ -4,7 +4,7 @@ import * as nodemailer from 'nodemailer'
 import jwt from 'jsonwebtoken'
 import { TokenStorage } from '../models/tokenStorage'
 
-export class UserController {
+export default class UserController {
   async saveToken (userId: number, token: string): Promise<void> {
     const tokenStorage = await TokenStorage.create({
       userId,
@@ -120,7 +120,42 @@ export class UserController {
     }
   }
 
+  async resetPassword (req: Request, res: Response): Promise<void> {
+    const { password } = req.body
+
+    if (typeof password !== 'string') {
+      throw new Error('Invalid password format')
+    }
+
+    const token: string | undefined = req.headers.authorization?.split(' ')[1]
+
+    if (token !== undefined) {
+      const decodedToken = jwt.verify(token, process.env.JWTSECRET ?? 'supersecret') as jwt.JwtPayload
+
+      const userId: number = decodedToken.userId
+
+      const user: User | null = await User.findByPk(userId)
+      if (user !== null) {
+        user.password = password
+
+        await user.save()
+
+        res.status(201).json({ message: 'Password has been changes successfully' })
+      } else {
+        res.status(404).json({ message: 'Error! User not found!' })
+      }
+    } else {
+      res.status(404).json({ message: 'Error! Send token!' })
+    }
+  }
+
   async getAll (req: Request, res: Response): Promise<void> {
+    const users: User[] = await User.findAll()
+    if (users !== null) {
+      res.status(201).json(users)
+    } else {
+      res.status(400).json({ message: 'Error, bad request' })
+    }
   }
 
   async getOne (req: Request, res: Response): Promise<void> {
@@ -128,14 +163,50 @@ export class UserController {
   }
 
   async update (req: Request, res: Response): Promise<void> {
+    const id = req.params.id
 
+    const { role } = req.body
+
+    console.log(role)
+
+    if (id !== null) {
+      const user: User | null = await User.findByPk(id)
+
+      if (user !== null) {
+        user.role = role.toString()
+
+        await user.save()
+
+        res.status(201).json({ message: 'User role updated successfully' })
+      } else {
+        res.status(404).json({ message: 'Error! User not found' })
+      }
+    } else {
+      res.status(400).json({ message: 'Bad request' })
+    }
   }
 
   async delete (req: Request, res: Response): Promise<void> {
+    const id = req.params.id
 
+    if (id === null) {
+      console.log('Error, id is null')
+    }
+
+    const deletedUser = await User.destroy(
+      { where: { id } }
+    )
+
+    if (deletedUser != null) {
+      res.json({ message: 'Deleted successfully' }).status(201)
+      console.log('Succes, user deleted successfully')
+    } else {
+      res.json({ message: 'Not found' }).status(404)
+      console.log('Error, user not deleted')
+    }
   }
 
-  async login (req: Request, res: Response): Promise<void> {
+  static async login (req: Request, res: Response): Promise<void> {
     const { email, password } = req.body
 
     if (typeof email !== 'string') {

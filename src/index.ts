@@ -6,12 +6,23 @@ import { router } from './routes'
 import { initUserModel } from './models/user'
 import { errorMiddleware } from './middleware/errorMiddleware'
 import { initTokenStorageModel } from './models/tokenStorage'
+import methodOverride from 'method-override'
+import path from 'path'
 
 dotenv.config()
 console.log(process.env.DB_DATABASE)
 
 const app: Express = express()
+
+app.use(methodOverride('_method'))
+
 const port = process.env.PORT ?? 3003
+
+app.set('view engine', 'ejs')
+app.set('views', path.join(__dirname, 'views'))
+
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use(express.json())
 
 app.use('/api', router)
